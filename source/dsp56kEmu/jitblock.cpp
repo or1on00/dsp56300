@@ -7,7 +7,7 @@
 
 namespace dsp56k
 {
-	constexpr uint32_t g_maxInstructionsPerBlock = 0;	// set to 1 for debugging/tracing
+	constexpr uint32_t g_maxInstructionsPerBlock = 1;	// set to 1 for debugging/tracing
 
 	JitBlock::JitBlock(JitEmitter& _a, DSP& _dsp, JitRuntimeData& _runtimeData)
 	: m_runtimeData(_runtimeData)
@@ -138,7 +138,8 @@ namespace dsp56k
 					TWord opB;
 					m_dsp.memory().getOpcode(pc, opA, opB);
 					const auto branchTarget = getBranchTarget(oi.getInstruction(), opA, opB, pc);
-					if(branchTarget != g_invalidAddress && branchTarget != g_dynamicAddress)
+					const bool spaceLeft = !g_maxInstructionsPerBlock || m_encodedInstructionCount < g_maxInstructionsPerBlock;
+					if(branchTarget != g_invalidAddress && branchTarget != g_dynamicAddress && spaceLeft)
 					{
 						assert(branchTarget < m_dsp.memory().size());
 
