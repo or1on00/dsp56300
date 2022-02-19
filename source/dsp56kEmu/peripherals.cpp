@@ -18,7 +18,7 @@ namespace dsp56k
 		m_mem[XIO_IDR - XIO_Reserved_High_First] = 0x001362;
 	}
 
-	TWord Peripherals56303::read(TWord _addr, Instruction _inst)
+	TWord Peripherals56303::read(EMemArea _area, TWord _addr, Instruction _inst)
 	{
 //		LOG( "Periph read @ " << std::hex << _addr );
 
@@ -37,7 +37,7 @@ namespace dsp56k
 		return m_mem[_addr - XIO_Reserved_High_First];
 	}
 
-	void Peripherals56303::write(TWord _addr, TWord _val)
+	void Peripherals56303::write(EMemArea _area, TWord _addr, TWord _val)
 	{
 //		LOG( "Periph write @ " << std::hex << _addr );
 
@@ -78,7 +78,7 @@ namespace dsp56k
 	{
 	}
 
-	TWord Peripherals56362::read(TWord _addr, Instruction _inst)
+	TWord Peripherals56362::read(EMemArea _area, TWord _addr, Instruction _inst)
 	{
 		switch (_addr)
 		{
@@ -149,7 +149,7 @@ namespace dsp56k
 		return value;
 	}
 
-	void Peripherals56362::write(const TWord _addr, const TWord _val)
+	void Peripherals56362::write(EMemArea _area, const TWord _addr, const TWord _val)
 	{
 		switch (_addr)
 		{

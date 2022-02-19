@@ -80,11 +80,11 @@ namespace dsp56k
 
 	void Essi::set(const EssiIndex _index, const EssiRegX _reg, const TWord _value)
 	{
-		m_periph.write(address(_index, _reg), _value);
+		m_periph.write(MemArea_X, address(_index, _reg), _value);
 	}
 
 	TWord Essi::get(const EssiIndex _index, const EssiRegX _reg) const
 	{
-		return m_periph.read(address(_index, _reg), Nop);
+		return m_periph.read(MemArea_X, address(_index, _reg), Nop);
 	}
 };

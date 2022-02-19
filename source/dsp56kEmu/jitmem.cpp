@@ -268,12 +268,12 @@ namespace dsp56k
 
 	TWord callDSPMemReadPeriph(DSP* const _dsp, const TWord _area, const TWord _offset, Instruction _inst)
 	{
-		return _dsp->getPeriph(_area)->read(_offset, _inst);
+		return _dsp->getPeriph().read(_area ? MemArea_Y : MemArea_X, _offset, _inst);
 	}
 
 	void callDSPMemWritePeriph(DSP* const _dsp, const TWord _area, const TWord _offset, const TWord _value)
 	{
-		_dsp->getPeriph(_area)->write(_offset, _value);
+		_dsp->getPeriph().write(_area ? MemArea_Y : MemArea_X, _offset, _value);
 	}
 
 	void Jitmem::readPeriph(const JitReg64& _dst, EMemArea _area, const TWord& _offset, Instruction _inst) const

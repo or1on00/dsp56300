@@ -12,7 +12,7 @@ namespace dsp56k
 {
 	JitUnittests::JitUnittests()
 	: mem(m_defaultMemoryValidator, 0x100)
-	, dsp(mem, &peripherals, &peripherals)
+	, dsp(mem, peripherals)
 	, m_checks({})
 	{
 		runTest(&JitUnittests::conversion_build, &JitUnittests::conversion_verify);
@@ -1208,8 +1208,8 @@ namespace dsp56k
 
 	void JitUnittests::bclr_qqpp_build(JitBlock& _block, JitOps& _ops)
 	{
-		dsp.getPeriph(0)->write(0xffff90, 0x334455);
-		dsp.getPeriph(0)->write(0xffffd0, 0x556677);
+		dsp.getPeriph().write(MemArea_X, 0xffff90, 0x334455);
+		dsp.getPeriph().write(MemArea_X, 0xffffd0, 0x556677);
 
 		_ops.emit(0, 0x11002);	// bclr #$2,x:<<$ffff90	- bclr_qq
 		_ops.emit(0, 0xa9004);	// bclr #$4,x:<<$ffffd0 - bclr_pp
@@ -1217,8 +1217,8 @@ namespace dsp56k
 
 	void JitUnittests::bclr_qqpp_verify()
 	{
-		const auto a = dsp.getPeriph(0)->read(0xffff90, Bclr_qq);
-		const auto b = dsp.getPeriph(0)->read(0xffffd0, Bclr_pp);
+		const auto a = dsp.getPeriph().read(MemArea_X, 0xffff90, Bclr_qq);
+		const auto b = dsp.getPeriph().read(MemArea_X, 0xffffd0, Bclr_pp);
 		assert(a == 0x334451);	// bit 2 cleared
 		assert(b == 0x556667);	// bit 4 cleared
 	}
@@ -2464,7 +2464,7 @@ namespace dsp56k
 		// op_Movep_ppea
 		runTest([&](JitBlock& _block, JitOps& _ops)
 		{
-			peripherals.write(0xffffc5, 0);
+			peripherals.write(MemArea_X, 0xffffc5, 0);
 			_ops.emit(0, 0x08f485, 0xffeeff);	// movep #>$112233,x:<<$ffffc5
 		},
 		[&]()
@@ -2475,7 +2475,7 @@ namespace dsp56k
 		// op_Movep_Xqqea
 		runTest([&](JitBlock& _block, JitOps& _ops)
 		{
-			peripherals.write(0xffff85, 0);
+			peripherals.write(MemArea_X, 0xffff85, 0);
 			_ops.emit(0, 0x07f405, 0x334455);	// movep #>$334455,x:<<$ffff85
 		},
 		[&]()
@@ -2486,7 +2486,7 @@ namespace dsp56k
 		// op_Movep_Yqqea
 		runTest([&](JitBlock& _block, JitOps& _ops)
 		{
-			peripherals.write(0xffff82, 0);
+			peripherals.write(MemArea_Y, 0xffff82, 0);
 			_ops.emit(0, 0x07b482, 0x556677);	// movep #>$556677,y:<<$ffff82
 		},
 		[&]()
@@ -2497,7 +2497,7 @@ namespace dsp56k
 		// op_Movep_SXqq
 		runTest([&](JitBlock& _block, JitOps& _ops)
 		{
-			peripherals.write(0xffff84, 0);
+			peripherals.write(MemArea_X, 0xffff84, 0);
 			dsp.y1(0x334455);
 			_ops.emit(0, 0x04c784);	// movep y1,x:<<$ffff84
 		},
@@ -2509,7 +2509,7 @@ namespace dsp56k
 		// op_Movep_SYqq
 		runTest([&](JitBlock& _block, JitOps& _ops)
 		{
-			peripherals.write(0xffff86, 0x112233);
+			peripherals.write(MemArea_Y, 0xffff86, 0x112233);
 			dsp.regs().b.var = 0;
 			_ops.emit(0, 0x044f26);	// movep y:<<$ffff86,b
 		},
@@ -2521,7 +2521,7 @@ namespace dsp56k
 		// op_Movep_Spp
 		runTest([&](JitBlock& _block, JitOps& _ops)
 		{
-			peripherals.write(0xffffc5, 0x8899aa);
+			peripherals.write(MemArea_Y, 0xffffc5, 0x8899aa);
 			dsp.y1(0);
 			_ops.emit(0, 0x094705);	// movep y:<<$ffffc5,y1
 		},

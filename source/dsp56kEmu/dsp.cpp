@@ -42,9 +42,9 @@ namespace dsp56k
 	// _____________________________________________________________________________
 	// DSP
 	//
-	DSP::DSP(Memory& _memory, IPeripherals* _pX, IPeripherals* _pY)
+	DSP::DSP(Memory& _memory, IPeripherals& _p)
 		: mem(_memory)
-		, perif({_pX, _pY})
+		, perif(_p)
 		, pcCurrentInstruction(0xffffff)
 		, m_jit(*this)
 		, m_disasm(m_opcodes)
@@ -53,11 +53,8 @@ namespace dsp56k
 
 		m_disasm.addSymbols(mem);
 		
-		perif[0]->setDSP(this);
-		perif[1]->setDSP(this);
-
-		perif[0]->setSymbols(m_disasm);
-		perif[1]->setSymbols(m_disasm);
+		perif.setDSP(this);
+		perif.setSymbols(m_disasm);
 
 		clearOpcodeCache();
 
@@ -72,9 +69,7 @@ namespace dsp56k
 		// 100162AEd01.pdf - page 2-16
 
 		// TODO: internal peripheral devices are reset
-		perif[0]->reset();
-		if(perif[1] != perif[0])
-			perif[1]->reset();
+		perif.reset();
 
 		for (int i=0;i<8;i++) set_m(i, 0xFFFFFF);
 		reg.r[0] = reg.r[1] = reg.r[2] = reg.r[3] = reg.r[4] = reg.r[5] = reg.r[6] = reg.r[7] = TReg24(int(0));
@@ -173,7 +168,7 @@ namespace dsp56k
 
 		m_peripheralCounter += 32;
 
-		perif[0]->exec();
+		perif.exec();
 	}
 
 	void DSP::tryExecInterrupts()
@@ -277,8 +272,7 @@ namespace dsp56k
 
 	void DSP::terminate()
 	{
-		for(size_t i=0; i<perif.size(); ++i)
-			perif[i]->terminate();
+		perif.terminate();
 	}
 
 	std::string DSP::getSSindent() const
@@ -369,9 +363,7 @@ namespace dsp56k
 		error, NMI, illegal instruction, Trap, Debug request, and hardware reset interrupts.
 		*/
 
-		perif[0]->reset();
-		if(perif[1] != perif[0])
-			perif[1]->reset();
+		perif.reset();
 	}
 
 	void DSP::jsr(const TReg24& _val)
@@ -993,7 +985,7 @@ namespace dsp56k
 
 	bool DSP::memWritePeriph( EMemArea _area, TWord _offset, TWord _value )
 	{
-		perif[_area - MemArea_X]->write(_offset, _value );
+		perif.write(_area, _offset, _value );
 		return true;
 	}
 	bool DSP::memWritePeriphFFFF80( EMemArea _area, TWord _offset, TWord _value )
@@ -1051,7 +1043,7 @@ namespace dsp56k
 
 	TWord DSP::memReadPeriph(EMemArea _area, TWord _offset, Instruction _inst) const
 	{
-		return perif[_area - MemArea_X]->read(_offset, _inst);
+		return perif.read(_area, _offset, _inst);
 	}
 	TWord DSP::memReadPeriphFFFF80(EMemArea _area, TWord _offset, Instruction _inst) const
 	{

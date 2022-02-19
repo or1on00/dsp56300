@@ -111,7 +111,7 @@ namespace dsp56k
 		// members
 		//
 		Memory&							mem;
-		std::array<IPeripherals*, 2>	perif;
+		IPeripherals&	                                        perif;
 		uint32_t						m_peripheralCounter = 0;
 		
 		TWord							pcCurrentInstruction = 0;
@@ -173,7 +173,7 @@ namespace dsp56k
 		// implementation
 		//
 	public:
-				DSP								( Memory& _memory, IPeripherals* _pX, IPeripherals* _pY );
+				DSP								( Memory& _memory, IPeripherals& _p );
 
 		void 	resetHW							();
 		void 	resetSW							();
@@ -237,8 +237,8 @@ namespace dsp56k
 		const Opcodes&	opcodes							() const									{ return m_opcodes; }
 		Disassembler&	disassembler					()											{ return m_disasm; }
 
-		void			setPeriph						(const size_t _index, IPeripherals* _periph)	{ perif[_index] = _periph; _periph->setDSP(this); }
-		IPeripherals*	getPeriph						(const size_t _index)							{ return perif[_index]; }
+		void			setPeriph						(IPeripherals& _periph)	{ perif = _periph; _periph.setDSP(this); }
+		IPeripherals&	        getPeriph					()				{ return perif; }
 		
 		ProcessingMode getProcessingMode() const		{return m_processingMode;}
 
